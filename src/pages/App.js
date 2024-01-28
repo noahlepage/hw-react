@@ -8,62 +8,74 @@ function sendOverSocket(blob) {
 
   socket.onopen = async (event) => {
     socket.send(await blob);
-  }
+  };
   socket.onmessage = (event) => {
     console.log("Message from server ", event.data);
-  }
+  };
 }
 
 async function captureAndSendAudio(e, setRes) {
-  const constraints = window.constraints = {
+  const constraints = (window.constraints = {
     audio: true,
-    video: false
-  };
+    video: false,
+  });
 
-  let blobs = []
+  let blobs = [];
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints) 
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
     let recorder = RecordRTC(stream, {
-      type: 'audio',
-      mimeType: 'audio/wav',
+      type: "audio",
+      mimeType: "audio/wav",
       timeSlice: 1000,
-      ondataavailable: (blob) => {sendOverSocket(blob); blobs.push(blob)}
-    })
-    recorder.startRecording()
+      ondataavailable: (blob) => {
+        sendOverSocket(blob);
+        blobs.push(blob);
+      },
+    });
+    recorder.startRecording();
 
-    const sleep = m => new Promise(r => setTimeout(r, m));
+    const sleep = (m) => new Promise((r) => setTimeout(r, m));
     await sleep(3000);
 
-    recorder.stopRecording()
+    recorder.stopRecording();
 
     // const audio = ref.current
     // console.log(audio)
     // window.stream = stream
-    // audio.srcObject = stream 
+    // audio.srcObject = stream
     // audio.play()
   } catch (e) {
-    console.log("no permission :(")    
+    console.log("no permission :(");
   }
-    // const audio = ref.current
-    // audio.src = URL.createObjectURL(blobs[0])
-    // audio.play()
-  setRes(blobs)
+  // const audio = ref.current
+  // audio.src = URL.createObjectURL(blobs[0])
+  // audio.play()
+  setRes(blobs);
 }
 
 function App() {
   // const audioRef = useRef(null)
-  const [audioRes, setAudioRes] = useState([])
-  console.log(audioRes)
+  const [audioRes, setAudioRes] = useState([]);
+  const [recording, setRecording] = useState(false);
+  console.log(audioRes);
 
-  return(
+  return (
     <div>
-
       <h1>Supppp</h1>
-      <button onClick={async (e) => await captureAndSendAudio(e, setAudioRes)}>Start Discussion!</button>
+      <button
+        onClick={async (e) => {
+          setRecording((r) => !r);
+          if (!recording) {
+            await captureAndSendAudio(e, setAudioRes);
+          }
+        }}
+      >
+        {recording ? "Stop recording" : "Start Discussion!"}
+      </button>
       {/* <audio controls ref={audioRef}></audio> */}
     </div>
-  )
+  );
 }
 
 export default App;
