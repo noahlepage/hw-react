@@ -1,6 +1,6 @@
 import logo from "../logo.svg";
 import "../App.css";
-import RecordRTC from "recordrtc";
+import RecordRTC, { MediaStreamRecorder } from "recordrtc";
 import { useRef, useState } from "react";
 
 function sendOverSocket(blob) {
@@ -20,13 +20,26 @@ async function captureAndSendAudio(e, setRes) {
     video: false,
   });
 
-  let blobs = [];
+  let blobs = []
+//   let config = {
+//     mimeType: 'audio/wav', // vp8, vp9, h264, mkv, opus/vorbis
+//     audioBitsPerSecond : 256 * 8 * 1024,
+//     videoBitsPerSecond : 256 * 8 * 1024,
+//     bitsPerSecond: 256 * 8 * 1024,  // if this is provided, skip above two
+//     checkForInactiveTracks: true,
+//     timeSlice: 1000, // concatenate intervals based blobs
+//     ondataavailable: (blob) => {sendOverSocket(blob); blobs.push(blob)}
+// }
+  let RecordRTC = require('recordrtc')
+  let MediaStreamRecorder = RecordRTC.MediaStreamRecorder
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const stream = await navigator.mediaDevices.getUserMedia(constraints) 
+    // let recorder = new MediaStreamRecorder(stream, config)
     let recorder = RecordRTC(stream, {
-      type: "audio",
-      mimeType: "audio/wav",
+      type: 'audio',
+      mimeType: 'audio/wav',
+      recorderType: RecordRTC.StereoAudioRecorder,
       timeSlice: 1000,
       ondataavailable: (blob) => {
         sendOverSocket(blob);
@@ -47,6 +60,7 @@ async function captureAndSendAudio(e, setRes) {
     // audio.play()
   } catch (e) {
     console.log("no permission :(");
+    console.log(e)
   }
   // const audio = ref.current
   // audio.src = URL.createObjectURL(blobs[0])

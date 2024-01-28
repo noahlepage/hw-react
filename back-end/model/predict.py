@@ -57,9 +57,9 @@ def predict(name, data, transfer_model, clf):
     spect = get_spect(data, RATE, f"./temp/{name}.jpg")
     expanded_spect = np.expand_dims(spect, axis=0)
     features = transfer_model.predict(expanded_spect)
-    print(f"Prediction for {name}: " + str(clf.predict(features)[0]))
-    print(f"Confidence: " + str(clf.predict_proba(features)[0]))
-
+    return clf.predict(features)[0]
+    # print(f"Prediction for {name}: " + str(clf.predict(features)[0]))
+    # print(f"Confidence: " + str(clf.predict_proba(features)[0]))
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
@@ -77,46 +77,46 @@ x = vgg_model.output
 x = Flatten(name="Flatten")(x) # Flatten dimensions to for use in FC layers
 trained_model = Model(inputs=vgg_model.input, outputs=x)
 transfer_model = Model(inputs=trained_model.input, outputs=trained_model.get_layer('Flatten').output)
-clf = load('saved_model.joblib') 
+# clf = load('saved_model.joblib') 
 
 
-p = pyaudio.PyAudio()
+# p = pyaudio.PyAudio()
 
-stream = p.open(format=FORMAT,
-                channels=CHANNELS,
-                rate=RATE,
-                input=True,
-                frames_per_buffer=CHUNK)
+# stream = p.open(format=FORMAT,
+#                 channels=CHANNELS,
+#                 rate=RATE,
+#                 input=True,
+#                 frames_per_buffer=CHUNK)
 
-print("* recording")
+# print("* recording")
 
-frames = []
-np_frames = []
-chunks_per_second = int(RATE / CHUNK)
+# frames = []
+# np_frames = []
+# chunks_per_second = int(RATE / CHUNK)
 
-threads = []
-for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-    curr_sec = i // chunks_per_second 
+# threads = []
+# for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+#     curr_sec = i // chunks_per_second 
     
-    data = stream.read(CHUNK)
-    frames.append(data)
+#     data = stream.read(CHUNK)
+#     frames.append(data)
     
-    np_frames.append(np.frombuffer(data, dtype=np.int16))
-    if i % chunks_per_second == 0 and curr_sec > 1:
-        data = np.copy(np_frames[(curr_sec - 1) * chunks_per_second : curr_sec * chunks_per_second])
-        if curr_sec == 2:
-            print(len(np_frames[(2 - 1) * chunks_per_second : 2 * chunks_per_second]))
-        th = threading.Thread(target=predict, \
-                              args=(curr_sec, data, transfer_model, clf), \
-                                daemon=True)  
-        threads.append(th)
-        th.start()
+#     np_frames.append(np.frombuffer(data, dtype=np.int16))
+#     if i % chunks_per_second == 0 and curr_sec > 1:
+#         data = np.copy(np_frames[(curr_sec - 1) * chunks_per_second : curr_sec * chunks_per_second])
+#         if curr_sec == 2:
+#             print(len(np_frames[(2 - 1) * chunks_per_second : 2 * chunks_per_second]))
+#         th = threading.Thread(target=predict, \
+#                               args=(curr_sec, data, transfer_model, clf), \
+#                                 daemon=True)  
+#         threads.append(th)
+#         th.start()
 
-print("* done recording")
+# print("* done recording")
 
-stream.stop_stream()
-stream.close()
-p.terminate()
+# stream.stop_stream()
+# stream.close()
+# p.terminate()
 
-for th in threads:
-    th.join()
+# for th in threads:
+#     th.join()
