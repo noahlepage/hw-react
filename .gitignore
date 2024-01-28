@@ -25,5 +25,5 @@ yarn-error.log*
 # python
 back-end/.venv
 back-end/model/data
-back-end/model/temp
+*temp*
 *__pycache__*
