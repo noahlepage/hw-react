@@ -14,7 +14,7 @@ CORS(app)
 
 ls_of_user = []
 
-file_path = "/workspaces/hw-react/back-end/src/Database.csv"
+file_path = "./Database.csv"
 
 def file_exists(file_path):
     return os.path.exists(file_path)

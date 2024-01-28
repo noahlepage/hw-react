@@ -64,7 +64,7 @@ CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-RECORD_SECONDS = 5
+RECORD_SECONDS = 10
 WAVE_OUTPUT_FILENAME = "output.wav"
 
 vgg_model = VGG16(weights='imagenet',include_top=False, input_shape=(369, 496, 3))

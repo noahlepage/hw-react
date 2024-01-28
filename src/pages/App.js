@@ -17,7 +17,7 @@ function App() {
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
-        console.log("stream");
+        console.log("stream", stream.active, stream.getAudioTracks().length);
         let recorder = new RecordRTC(stream, {
           type: "audio",
           mimeType: "audio/webm;codecs=pcm", // endpoint requires 16bit PCM audio
@@ -33,9 +33,8 @@ function App() {
               const base64data = reader.result;
 
               // audio data must be sent as a base64 encoded string
-              console.log("if socket?");
               if (socket) {
-                console.log("SENDING AUDIO DATA");
+                console.log("Sending to backend");
                 socket.send(
                   JSON.stringify({ audio_data: base64data.split("base64,")[1] })
                 );
