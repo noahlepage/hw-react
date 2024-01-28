@@ -21,3 +21,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# python
+back-end/.venv
+back-end/model/data
+back-end/model/temp
