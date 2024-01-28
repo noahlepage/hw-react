@@ -2,21 +2,58 @@ import asyncio
 import websockets 
 from flask import Flask
 from flask_cors import CORS
+import os
+import csv
+from User import *
+
+import uuid
+
 
 app = Flask(__name__)
 CORS(app)
 
+ls_of_user = []
 
+def file_exists(file_path):
+    return os.path.exists(file_path)
 
+file_path = "Database.csv"
 
-from User import *
+if file_exists(file_path):
+    # open with read
+    # load its content
+    load_content_from_database()
+
+else:
+    open(file_path, 'w') as file
+    file.close
+
+def load_content_from_database() : 
+    
+    with open(file_path, 'r') as csv_file:
+    # Create a CSV dictionary reader object
+    csv_reader = csv.DictReader(csv_file)
+
+    # Iterate through each row in the CSV file
+    for row in csv_reader:
+        # Access columns by their names
+
+        # [ID, Name]
+
+        ls_of_user.add(User(row['ID'],row['Name'],row['Data']))
+
+    csv_file.close()
 
 def which_user_is_this(data) :
     # this part simply user the ai model to figure out what user this is 
 
-    current_user = User()
-
-    return current_user
+    for user in ls_of_user :
+        if user.get_data() == data :
+            user.increase_time_spoken()
+            return
+    
+    ls_of_user.add(User(uuid.uuid4(),"aName",data)
+    return
 
 
 
