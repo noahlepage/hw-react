@@ -1,9 +1,20 @@
 import logo from "../logo.svg";
 import "../App.css";
 import RecordRTC from "recordrtc";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
-async function captureAndSendAudio(e, ref) {
+function sendOverSocket(blob) {
+  const socket = new WebSocket("ws://localhost:8000/ws");
+
+  socket.onopen = async (event) => {
+    socket.send(await blob);
+  }
+  socket.onmessage = (event) => {
+    console.log("Message from server ", event.data);
+  }
+}
+
+async function captureAndSendAudio(e, setRes) {
   const constraints = window.constraints = {
     audio: true,
     video: false
@@ -17,7 +28,7 @@ async function captureAndSendAudio(e, ref) {
       type: 'audio',
       mimeType: 'audio/wav',
       timeSlice: 1000,
-      ondataavailable: (blob) => blobs.push(blob)
+      ondataavailable: (blob) => {sendOverSocket(blob); blobs.push(blob)}
     })
     recorder.startRecording()
 
@@ -37,17 +48,20 @@ async function captureAndSendAudio(e, ref) {
     // const audio = ref.current
     // audio.src = URL.createObjectURL(blobs[0])
     // audio.play()
+  setRes(blobs)
 }
 
 function App() {
-  const audioRef = useRef(null)
+  // const audioRef = useRef(null)
+  const [audioRes, setAudioRes] = useState([])
+  console.log(audioRes)
 
   return(
     <div>
 
       <h1>Supppp</h1>
-      <button onClick={async (e) => captureAndSendAudio(e, audioRef)}>Start Discussion!</button>
-      <audio controls ref={audioRef}></audio>
+      <button onClick={async (e) => await captureAndSendAudio(e, setAudioRes)}>Start Discussion!</button>
+      {/* <audio controls ref={audioRef}></audio> */}
     </div>
   )
 }
