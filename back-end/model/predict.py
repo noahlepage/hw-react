@@ -58,6 +58,7 @@ def predict(name, data, transfer_model, clf):
     expanded_spect = np.expand_dims(spect, axis=0)
     features = transfer_model.predict(expanded_spect)
     print(f"Prediction for {name}: " + str(clf.predict(features)[0]))
+    print(f"Confidence: " + str(clf.predict_proba(features)[0]))
 
 
 CHUNK = 1024
